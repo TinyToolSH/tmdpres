@@ -1,0 +1,51 @@
+#!/bin/bash
+
+#This file is part of the TinyTools distribution (https://github.com/Calebe94/TinyTools).
+#Copyright (C)  TinyTools
+
+#This program is free software: you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation, version 3 of the License.
+
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+
+#You should have received a copy of the GNU General Public License
+#along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+usage()
+{
+    echo "tmdpress presentation.md"
+    exit 1
+}
+
+[ -z "$1" ] && usage
+
+filename=$1
+pandoc_filename="pandoc_${filename%.*}".html
+
+header_pres="header_${filename%.*}.html"
+footer_pres="footer_${filename%.*}.html"
+
+pres_filename="${filename%.*}".html
+
+title=$(tyaml $filename -v title)
+header=$(tyaml $filename -v header)
+footer=$(tyaml $filename -v footer)
+content=$(cat $filename)
+
+cp _header.html $header_pres
+cp _footer.html $footer_pres
+
+sed -i "s+__TITLE__+$title+g" $header_pres
+sed -i "s+__HEADER__+$header+g" $header_pres
+sed -i "s+__FOOTER__+$footer+g" $header_pres
+
+pandoc $filename -o $pandoc_filename
+cat $header_pres $pandoc_filename $footer_pres > $pres_filename
+
+rm $header_pres $footer_pres $pandoc_filename
+
+echo "OK!"
