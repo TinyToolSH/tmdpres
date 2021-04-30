@@ -15,37 +15,81 @@
 #You should have received a copy of the GNU General Public License
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+cat << EOF > pyprochtml
+#!/usr/bin/python
+import sys 
+file_content=str()
+for line in sys.stdin: 
+    file_content+=line
+content_splited = file_content.split('<hr />')
+for slide in content_splited:
+    print('<section>')
+    print(slide.strip())
+    print('</section>')
+EOF
+
+tmp_folder=/tmp/tmdpress
+
 usage()
 {
     echo "tmdpress presentation.md"
     exit 1
 }
 
+create_tmp_folder()
+{
+    mkdir -p "$tmp_folder"
+}
+
+copy_template_files()
+{
+    filename="$1"
+    header_pres="header_${filename%.*}.html"
+    footer_pres="footer_${filename%.*}.html"
+    cp _header.html "$tmp_folder/$header_pres"
+    cp _footer.html "$tmp_folder/$footer_pres"
+}
+
+fill_metadata()
+{
+    filename="$1"
+    header_pres="header_${filename%.*}.html"
+    title=$(tyaml $filename -v title)
+    header=$(tyaml $filename -v header)
+    footer=$(tyaml $filename -v footer)
+    content=$(cat $filename)
+    sed -i "s+__TITLE__+$title+g" "$tmp_folder/$header_pres"
+    sed -i "s+__HEADER__+$header+g" "$tmp_folder/$header_pres"
+    sed -i "s+__FOOTER__+$footer+g" "$tmp_folder/$header_pres"
+}
+
+convert_md_to_html()
+{
+    filename="$1"
+    pandoc_filename="pandoc_${filename%.*}".html
+    pandoc "$filename" -o "$tmp_folder/$pandoc_filename"
+}
+
+process_html_file()
+{
+    html_file="$1"
+    python pyprochtml < "$html_file"
+}
+
+create_presentation()
+{
+    pres_filename="${filename%.*}".html
+
+    cat $header_pres $pandoc_filename $footer_pres > $pres_filename
+}
+
+remove_tmp_folder()
+{
+    rm -fr "$tmp_folder"
+}
+
 [ -z "$1" ] && usage
 
 filename=$1
-pandoc_filename="pandoc_${filename%.*}".html
-
-header_pres="header_${filename%.*}.html"
-footer_pres="footer_${filename%.*}.html"
-
-pres_filename="${filename%.*}".html
-
-title=$(tyaml $filename -v title)
-header=$(tyaml $filename -v header)
-footer=$(tyaml $filename -v footer)
-content=$(cat $filename)
-
-cp _header.html $header_pres
-cp _footer.html $footer_pres
-
-sed -i "s+__TITLE__+$title+g" $header_pres
-sed -i "s+__HEADER__+$header+g" $header_pres
-sed -i "s+__FOOTER__+$footer+g" $header_pres
-
-pandoc $filename -o $pandoc_filename
-cat $header_pres $pandoc_filename $footer_pres > $pres_filename
-
-rm $header_pres $footer_pres $pandoc_filename
 
 echo "OK!"
