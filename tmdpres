@@ -67,20 +67,22 @@ convert_md_to_html()
 {
     filename="$1"
     pandoc_filename="pandoc_${filename%.*}".html
-    pandoc "$filename" -o "$tmp_folder/$pandoc_filename"
+    pandoc "$filename" -t html | process_html_file > "$tmp_folder/$pandoc_filename"
 }
 
 process_html_file()
 {
-    html_file="$1"
-    python pyprochtml < "$html_file"
+    python pyprochtml
 }
 
 create_presentation()
 {
+    filename="$1"
     pres_filename="${filename%.*}".html
-
-    cat $header_pres $pandoc_filename $footer_pres > $pres_filename
+    pandoc_filename="pandoc_${filename%.*}".html
+    header_pres="header_${filename%.*}.html"
+    footer_pres="footer_${filename%.*}.html"
+    cat $tmp_folder/$header_pres $tmp_folder/$pandoc_filename $tmp_folder/$footer_pres > $pres_filename
 }
 
 remove_tmp_folder()
@@ -91,5 +93,14 @@ remove_tmp_folder()
 [ -z "$1" ] && usage
 
 filename=$1
+
+[ -d $tmp_folder ] &&  rm -fr remove_tmp_folder
+
+create_tmp_folder
+
+copy_template_files "$filename"
+fill_metadata "$filename"
+convert_md_to_html "$filename"
+create_presentation "$filename"
 
 echo "OK!"
