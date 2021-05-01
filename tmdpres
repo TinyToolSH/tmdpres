@@ -18,7 +18,6 @@
 pyprochtml_path=/tmp/pyprocesshtml.py
 header_path=/tmp/_header.html
 footer_path=/tmp/_footer.html
-css_path=/tmp/sp.css
 tmp_folder=/tmp/tmdpress
 
 cat << EOF > $pyprochtml_path
