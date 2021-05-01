@@ -170,7 +170,7 @@ th, td {
   <button onclick="plusDivs(-1)">&#10094;</button>
   <button onclick="plusDivs(1)">&#10095;</button>
 </div>
-<div id="pagenumber" style="position:fixed; bottom: 20px; right: 20px;">1</div>
+<div id="pagenumber" style="position:fixed; bottom: 20px; right: 100px;">1</div>
 <script>
 var slideIndex = 1;
 document.addEventListener("keydown", ki, false);
