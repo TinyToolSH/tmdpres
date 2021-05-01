@@ -15,7 +15,12 @@
 #You should have received a copy of the GNU General Public License
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-cat << EOF > pyprochtml
+pyprochtml_path=/tmp/pyprocesshtml.py
+header_path=/tmp/_header.html
+footer_path=/tmp/_footer.html
+tmp_folder=/tmp/tmdpress
+
+cat << EOF > $pyprochtml_path
 #!/usr/bin/python
 import sys 
 file_content=str()
@@ -23,18 +28,18 @@ for line in sys.stdin:
     file_content+=line
 content_splited = file_content.split('<hr />')
 for slide in content_splited:
-    print('<section>')
+    print('<div class="slide">')
     print(slide.strip())
-    print('</section>')
+    print('</div>')
 EOF
 
-cat << EOF > _header.html
+cat << EOF > $header_path
 <html>
 <title>__TITLE__</title>
 <body style="margin: 80px;">
 EOF
 
-cat << EOF > _footer.html
+cat << EOF > $footer_path
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 .slide {
@@ -120,8 +125,6 @@ function printSlides() {
 </script>
 EOF
 
-tmp_folder=/tmp/tmdpress
-
 usage()
 {
     echo "tmdpress presentation.md"
@@ -150,9 +153,9 @@ fill_metadata()
     header=$(tyaml $filename -v header)
     footer=$(tyaml $filename -v footer)
     content=$(cat $filename)
-    sed -i "s+__TITLE__+$title+g" "$tmp_folder/$header_pres"
-    sed -i "s+__HEADER__+$header+g" "$tmp_folder/$header_pres"
-    sed -i "s+__FOOTER__+$footer+g" "$tmp_folder/$header_pres"
+    sed "s+__TITLE__+$title+g" $header_path > "$tmp_folder/$header_pres"
+    #sed "s+__HEADER__+$header+g" "$tmp_folder/$header_pres"
+    #sed "s+__FOOTER__+$footer+g" "$tmp_folder/$header_pres"
 }
 
 convert_md_to_html()
@@ -164,7 +167,7 @@ convert_md_to_html()
 
 process_html_file()
 {
-    python pyprochtml
+    python $pyprochtml_path
 }
 
 create_presentation()
@@ -174,7 +177,7 @@ create_presentation()
     pandoc_filename="pandoc_${filename%.*}".html
     header_pres="header_${filename%.*}.html"
     footer_pres="footer_${filename%.*}.html"
-    cat $tmp_folder/$header_pres $tmp_folder/$pandoc_filename $tmp_folder/$footer_pres > $pres_filename
+    cat $tmp_folder/$header_pres $tmp_folder/$pandoc_filename $footer_path > $pres_filename
 }
 
 remove_tmp_folder()
@@ -190,7 +193,7 @@ filename=$1
 
 create_tmp_folder
 
-copy_template_files "$filename"
+#copy_template_files "$filename"
 fill_metadata "$filename"
 convert_md_to_html "$filename"
 create_presentation "$filename"
