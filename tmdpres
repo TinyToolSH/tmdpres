@@ -154,8 +154,6 @@ fill_metadata()
     footer=$(tyaml $filename -v footer)
     content=$(cat $filename)
     sed "s+__TITLE__+$title+g" $header_path > "$tmp_folder/$header_pres"
-    #sed "s+__HEADER__+$header+g" "$tmp_folder/$header_pres"
-    #sed "s+__FOOTER__+$footer+g" "$tmp_folder/$header_pres"
 }
 
 convert_md_to_html()
@@ -193,7 +191,6 @@ filename=$1
 
 create_tmp_folder
 
-#copy_template_files "$filename"
 fill_metadata "$filename"
 convert_md_to_html "$filename"
 create_presentation "$filename"
