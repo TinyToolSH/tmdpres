@@ -1,55 +1,92 @@
 # tmdpres
 
-A Tiny Markdown presentation generator.
+A Tiny Markdown presentation generator. It is designed to convert `markdown` files to `html` presentations.
 
 ## Dependencies
 
-* [dzslides](https://github.com/paulrouget/dzslides);
+* [python3](https://www.python.org/downloads/);
 * [pandoc](https://pandoc.org/);
+* [tyaml](https://github.com/TinyToolSH/tyaml).
 
 ## Instalation
 
-To install `tgoeswall` you can edit the `Makefile` to match your local setup (`tgoeswall` is installed into the `/usr/local/bin` by default).
+To install `tmdpres` you can edit the `Makefile` to match your local setup (`tmdpres` is installed into the `/usr/local/bin` by default).
 
-Afterwards enter the following command to install `tgoeswall` (if necessary as root).
+Afterwards enter the following command to install `tmdpres` (if necessary as root).
 
 ```bash
 sudo make install
 ```
 
-After the installation you can enable `tgoeswall` to run as a service by running the following command (as user not as root):
+To uninstall `tmdpres`:
 
 ```bash
-tgoeswallctrl start
+sudo make uninstall
+```
+
+## Syntax
+
+You should write your `markdown` presentation by separating the slides with `---`.
+
+And can also add `yaml` metadata to the file by adding then as an `html` comment (to be hidden in the html file).
+By now `tmdpres` just interprets  `title` metadata.
+
+Example:
+
+```markdown
+<!--
+title: "Hello World"
+author: Edimar Calebe Castanho
+date: 2021-05-01
+time: 14:39
+-->
+
+<center>
+# This is an example
+</center>
+
+---
+
+## First!
+
+* Some list items
+* 2
+* 3
+
+---
+
+## Another slide
+
+* Thats it!
 ```
 
 ## Operation
 
-DZSlides is a one-file HTML template to build slides in HTML5 and CSS3.
+The `tmdpres` was designed to be a single file markdown presentation creator. It is designed to be as simple as possible. 
+The script converts your `markdown` presentation to `html` using pandoc.
+It then splits the result html file into slides and surround every slide into a `<div class="slide">` tag using a built-in python script.
+After this process `tmdpres` then creates your presentation by contatenating the your converted markdown with the built-in `_header` and `_footer.html`.
+Also `tmdpres` uses [spcss](https://github.com/susam/spcss) as CSS style.
 
-But we want it to work with markdown. We know that DZSlides separate each page as a html tag `<section>`.
+## Customization
 
-We should write our markdown presentetion by separating each page by surrounding it by the <section> tag.
-
-We can add metadata to the markdown file so the `tmdpres` can add these info to the presentation.
-
-`tmdpres` will replace the following info:
-
-* `__TITLE__`: get from metadata
-* `__HEADER__`: get from metadata
-* `__FOOTER__`: get from metada
-
-When running `tmdpres` it will surround our presentetion by the `_header.html` and `_footer.html` files.
-
-This files is the taken by `dzslides`'s `template.html` file.
+You can change the layout of the slides by changing the `_header.html` and `_footer.html` inside the `tmdpres` script.
 
 ## Usage
 
-To create your presentetion just run the following command:
+To create your presentation just run the following command:
 
 ```bash
-$ tmdpres presentetion.md
+$ tmdpres presentation.md
 ```
+
+The presentation output will be `presentation.html`.
+
+# Team
+
+| <img src="https://github.com/Calebe94.png?size=200" alt="Edimar Calebe Castanho"> | <img src="https://github.com/gbgabo.png?size=200" alt="Gabriel Gaboardi"> |
+|:---------------------------------------------------------------------------------:|:-------------------------------------------------------------------------:|
+| [Edimar Calebe Castanho (Calebe94)](https://github.com/Calebe94)                  | [Gabriel Gaboardi (Gabo)](https://github.com/gbgabo)                      |
 
 # License
 
