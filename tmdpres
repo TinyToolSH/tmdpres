@@ -37,7 +37,6 @@ EOF
 cat << EOF > $header_path
 <html>
 <head>
-<link rel="stylesheet" href="sp.css">
 <title>__TITLE__</title>
 </head>
 <body style="margin: 80px;">
@@ -46,79 +45,6 @@ EOF
 cat << EOF > $footer_path
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-@media print {
-.slide {
-    page-break-before: always;
-  }
-}
-@page { size: landscape; }
-</style>
-<div class="buttons" style="position:fixed; bottom: 20px;">
-  <button onclick="plusDivs(-1)">&#10094;</button>
-  <button onclick="plusDivs1)">&#10095;</button>
-  <button onclick="printSlides()">print</button>
-</div>
-<div id="pagenumber" style="position:fixed; bottom: 20px; right: 20px;">1</div>
-<script>
-var slideIndex = 1;
-document.addEventListener("keydown", ki, false);
-function ki(e) {
-  var keyCode = e.keyCode;
-  if(keyCode==39) {
-    plusDivs(1);
-  }
-  if(keyCode==37) {
-    plusDivs(-1);
-  }
-  if(keyCode==80) {
-    printSlides();
-  }
-  if(keyCode==72) {
-    hideButtons();
-  }
-}
-showDivs(slideIndex);
-function hideButtons() {
-  var x = document.getElementsByClassName("buttons");
-  if(x[0].style.display == "none") x[0].style.display = "block"
-  else x[0].style.display = "none";
-}
-function plusDivs(n) {
-  showDivs(slideIndex += n);
-}
-function showDivs(n) {
-  var i;
-  var x = document.getElementsByClassName("slide");
-  if (n > x.length) {slideIndex = 1}
-  if (n < 1) {slideIndex = x.length}
-  for (i = 0; i < x.length; i++) {
-     x[i].style.display = "none";
-  }
-  x[slideIndex - 1].style.display = "block";
-  var y = document.getElementById("pagenumber");
-  y.innerHTML = slideIndex + "/" + x.length;
-}
-function printSlides() {
-  var i;
-  var y = document.getElementById("pagenumber");
-  y.innerHTML = "";
-  var x = document.getElementsByClassName("slide");
-  for (i = 0; i < x.length; i++) {
-     x[i].style.display = "none";
-  }
-  for (i = 0; i < x.length; i++) {
-     x[i].style.display = "block";
-  }
-  window.print();
-  for (i = 0; i < x.length; i++) {
-     x[i].style.display = "none";
-  }
-  x[slideIndex - 1].style.display = "block";
-}
-</script>
-EOF
-
-cat << EOF > $css_path
 /* https://susam.github.io/spcss/ */
 body {
   color: #000;
@@ -234,6 +160,77 @@ th, td {
     border-color: #666;
   }
 }
+
+@media print {
+.slide {
+    page-break-before: always;
+  }
+}
+@page { size: landscape; }
+</style>
+<div class="buttons" style="position:fixed; bottom: 20px;">
+  <button onclick="plusDivs(-1)">&#10094;</button>
+  <button onclick="plusDivs1)">&#10095;</button>
+  <button onclick="printSlides()">print</button>
+</div>
+<div id="pagenumber" style="position:fixed; bottom: 20px; right: 20px;">1</div>
+<script>
+var slideIndex = 1;
+document.addEventListener("keydown", ki, false);
+function ki(e) {
+  var keyCode = e.keyCode;
+  if(keyCode==39) {
+    plusDivs(1);
+  }
+  if(keyCode==37) {
+    plusDivs(-1);
+  }
+  if(keyCode==80) {
+    printSlides();
+  }
+  if(keyCode==72) {
+    hideButtons();
+  }
+}
+showDivs(slideIndex);
+function hideButtons() {
+  var x = document.getElementsByClassName("buttons");
+  if(x[0].style.display == "none") x[0].style.display = "block"
+  else x[0].style.display = "none";
+}
+function plusDivs(n) {
+  showDivs(slideIndex += n);
+}
+function showDivs(n) {
+  var i;
+  var x = document.getElementsByClassName("slide");
+  if (n > x.length) {slideIndex = 1}
+  if (n < 1) {slideIndex = x.length}
+  for (i = 0; i < x.length; i++) {
+     x[i].style.display = "none";
+  }
+  x[slideIndex - 1].style.display = "block";
+  var y = document.getElementById("pagenumber");
+  y.innerHTML = slideIndex + "/" + x.length;
+}
+function printSlides() {
+  var i;
+  var y = document.getElementById("pagenumber");
+  y.innerHTML = "";
+  var x = document.getElementsByClassName("slide");
+  for (i = 0; i < x.length; i++) {
+     x[i].style.display = "none";
+  }
+  for (i = 0; i < x.length; i++) {
+     x[i].style.display = "block";
+  }
+  window.print();
+  for (i = 0; i < x.length; i++) {
+     x[i].style.display = "none";
+  }
+  x[slideIndex - 1].style.display = "block";
+}
+</script>
 EOF
 
 usage()
