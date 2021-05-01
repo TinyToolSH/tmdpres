@@ -15,37 +15,262 @@
 #You should have received a copy of the GNU General Public License
 #along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+pyprochtml_path=/tmp/pyprocesshtml.py
+header_path=/tmp/_header.html
+footer_path=/tmp/_footer.html
+tmp_folder=/tmp/tmdpress
+
+cat << EOF > $pyprochtml_path
+#!/usr/bin/python
+import sys 
+file_content=str()
+for line in sys.stdin: 
+    file_content+=line
+content_splited = file_content.split('<hr />')
+for slide in content_splited:
+    print('<div class="slide">')
+    print(slide.strip())
+    print('</div>')
+EOF
+
+cat << EOF > $header_path
+<html>
+<head>
+    <title>__TITLE__</title>
+</head>
+EOF
+
+cat << EOF > $footer_path
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+/* https://susam.github.io/spcss/ */
+body {
+  color: #000;
+  font-family: helvetica, arial, sans-serif;
+  line-height: 1.5;
+  max-width: 40em;
+  padding: 0 1em;
+  font-size: 40pt;
+  font-weight: 1800;
+  width: "100%";
+  margin: 80px;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin: 1em 0 0.5em 0;
+  line-height: 1.2;
+}
+a:link {
+  color: #00e;
+}
+a:visited {
+  color: #518;
+}
+a:focus, a:hover {
+  color: #03f;
+}
+a:active {
+  color: #e00;
+}
+h1 a:empty:before, h2 a:empty:before, h3 a:empty:before,
+h4 a:empty:before, h5 a:empty:before, h6 a:empty:before {
+  content: "#";
+}
+h1 a:empty, h2 a:empty, h3 a:empty, h4 a:empty, h5 a:empty, h6 a:empty {
+  visibility: hidden;
+  padding-left: 0.25em;
+}
+h1:hover a:empty, h2:hover a:empty, h3:hover a:empty,
+h4:hover a:empty, h5:hover a:empty, h6:hover a:empty {
+  visibility: visible;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 1em 0;
+  text-align: center;
+}
+figcaption {
+  font-size: small;
+}
+pre, code, samp, kbd {
+  color: #009;
+  font-family: monospace, monospace;
+}
+pre kbd {
+  color: #060;
+}
+pre, blockquote {
+  background: #eee;
+  padding: 0.5em;
+}
+pre {
+  overflow: auto;
+}
+blockquote {
+  border-left: medium solid #ccc;
+  margin: 1em 0;
+}
+blockquote :first-child {
+  margin-top: 0;
+}
+blockquote :last-child {
+  margin-bottom: 0;
+}
+table {
+  border-collapse: collapse;
+}
+th, td {
+  border: thin solid #999;
+  padding: 0.3em 0.4em;
+  text-align: left;
+}
+@media (prefers-color-scheme: dark) {
+  body {
+    color: #bbb;
+    background: #222;
+  }
+  a:link {
+    color: #9bf;
+  }
+  a:visited {
+    color: #caf;
+  }
+  a:focus, a:hover {
+    color: #9cf;
+  }
+  a:active {
+    color: #faa;
+  }
+  pre, code, samp, kbd {
+    color: #6cf;
+  }
+  pre kbd {
+    color: #9c9;
+  }
+  pre, blockquote {
+    background: #111;
+  }
+  blockquote {
+    border-color: #444;
+  }
+  th, td {
+    border-color: #666;
+  }
+}
+
+@media print {
+.slide {
+    page-break-before: always;
+  }
+}
+@page { size: landscape; }
+</style>
+<div class="buttons" style="position:fixed; bottom: 20px;">
+  <button onclick="plusDivs(-1)">&#10094;</button>
+  <button onclick="plusDivs(1)">&#10095;</button>
+</div>
+<div id="pagenumber" style="position:fixed; bottom: 20px; right: 100px;">1</div>
+<script>
+var slideIndex = 1;
+document.addEventListener("keydown", ki, false);
+function ki(e) {
+  var keyCode = e.keyCode;
+  if(keyCode==39) {
+    plusDivs(1);
+  }
+  if(keyCode==37) {
+    plusDivs(-1);
+  }
+  if(keyCode==72) {
+    hideButtons();
+  }
+}
+showDivs(slideIndex);
+function hideButtons() {
+  var x = document.getElementsByClassName("buttons");
+  if(x[0].style.display == "none") x[0].style.display = "block"
+  else x[0].style.display = "none";
+}
+function plusDivs(n) {
+  showDivs(slideIndex += n);
+}
+function showDivs(n) {
+  var i;
+  var x = document.getElementsByClassName("slide");
+  if (n > x.length) {slideIndex = x.length}
+  if (n < 1) {slideIndex = 1}
+  for (i = 0; i < x.length; i++) {
+     x[i].style.display = "none";
+  }
+  x[slideIndex - 1].style.display = "block";
+  var y = document.getElementById("pagenumber");
+  y.innerHTML = slideIndex + "/" + x.length;
+}
+</script>
+EOF
+
 usage()
 {
-    echo "tmdpress presentation.md"
+    echo "usage: tmdpress presentation.md"
     exit 1
+}
+
+create_tmp_folder()
+{
+    mkdir -p "$tmp_folder"
+}
+
+
+fill_metadata()
+{
+    filename="$1"
+    header_pres="header_${filename%.*}.html"
+    title=$(tyaml $filename -v title)
+    header=$(tyaml $filename -v header)
+    footer=$(tyaml $filename -v footer)
+    content=$(cat $filename)
+    sed "s+__TITLE__+$title+g" $header_path > "$tmp_folder/$header_pres"
+}
+
+convert_md_to_html()
+{
+    filename="$1"
+    pandoc_filename="pandoc_${filename%.*}".html
+    pandoc "$filename" -t html | process_html_file > "$tmp_folder/$pandoc_filename"
+}
+
+process_html_file()
+{
+    python $pyprochtml_path
+}
+
+create_presentation()
+{
+    filename="$1"
+    pres_filename="${filename%.*}".html
+    pandoc_filename="pandoc_${filename%.*}".html
+    header_pres="header_${filename%.*}.html"
+    footer_pres="footer_${filename%.*}.html"
+    cat $tmp_folder/$header_pres $tmp_folder/$pandoc_filename $footer_path > $pres_filename
+}
+
+remove_tmp_folder()
+{
+    rm -fr "$tmp_folder"
 }
 
 [ -z "$1" ] && usage
 
 filename=$1
-pandoc_filename="pandoc_${filename%.*}".html
 
-header_pres="header_${filename%.*}.html"
-footer_pres="footer_${filename%.*}.html"
+[ -d $tmp_folder ] &&  rm -fr remove_tmp_folder
 
-pres_filename="${filename%.*}".html
+create_tmp_folder
 
-title=$(tyaml $filename -v title)
-header=$(tyaml $filename -v header)
-footer=$(tyaml $filename -v footer)
-content=$(cat $filename)
+fill_metadata "$filename"
+convert_md_to_html "$filename"
+create_presentation "$filename"
 
-cp _header.html $header_pres
-cp _footer.html $footer_pres
+exit 0
 
-sed -i "s+__TITLE__+$title+g" $header_pres
-sed -i "s+__HEADER__+$header+g" $header_pres
-sed -i "s+__FOOTER__+$footer+g" $header_pres
-
-pandoc $filename -o $pandoc_filename
-cat $header_pres $pandoc_filename $footer_pres > $pres_filename
-
-rm $header_pres $footer_pres $pandoc_filename
-
-echo "OK!"
