@@ -136,14 +136,6 @@ create_tmp_folder()
     mkdir -p "$tmp_folder"
 }
 
-copy_template_files()
-{
-    filename="$1"
-    header_pres="header_${filename%.*}.html"
-    footer_pres="footer_${filename%.*}.html"
-    cp _header.html "$tmp_folder/$header_pres"
-    cp _footer.html "$tmp_folder/$footer_pres"
-}
 
 fill_metadata()
 {
