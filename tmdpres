@@ -169,8 +169,7 @@ th, td {
 </style>
 <div class="buttons" style="position:fixed; bottom: 20px;">
   <button onclick="plusDivs(-1)">&#10094;</button>
-  <button onclick="plusDivs1)">&#10095;</button>
-  <button onclick="printSlides()">print</button>
+  <button onclick="plusDivs(1)">&#10095;</button>
 </div>
 <div id="pagenumber" style="position:fixed; bottom: 20px; right: 20px;">1</div>
 <script>
@@ -183,9 +182,6 @@ function ki(e) {
   }
   if(keyCode==37) {
     plusDivs(-1);
-  }
-  if(keyCode==80) {
-    printSlides();
   }
   if(keyCode==72) {
     hideButtons();
@@ -211,23 +207,6 @@ function showDivs(n) {
   x[slideIndex - 1].style.display = "block";
   var y = document.getElementById("pagenumber");
   y.innerHTML = slideIndex + "/" + x.length;
-}
-function printSlides() {
-  var i;
-  var y = document.getElementById("pagenumber");
-  y.innerHTML = "";
-  var x = document.getElementsByClassName("slide");
-  for (i = 0; i < x.length; i++) {
-     x[i].style.display = "none";
-  }
-  for (i = 0; i < x.length; i++) {
-     x[i].style.display = "block";
-  }
-  window.print();
-  for (i = 0; i < x.length; i++) {
-     x[i].style.display = "none";
-  }
-  x[slideIndex - 1].style.display = "block";
 }
 </script>
 EOF
