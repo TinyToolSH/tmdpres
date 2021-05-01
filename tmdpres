@@ -127,7 +127,7 @@ EOF
 
 usage()
 {
-    echo "tmdpress presentation.md"
+    echo "usage: tmdpress presentation.md"
     exit 1
 }
 
@@ -195,4 +195,5 @@ fill_metadata "$filename"
 convert_md_to_html "$filename"
 create_presentation "$filename"
 
-echo "OK!"
+exit 0
+
