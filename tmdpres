@@ -18,6 +18,7 @@
 pyprochtml_path=/tmp/pyprocesshtml.py
 header_path=/tmp/_header.html
 footer_path=/tmp/_footer.html
+css_path=/tmp/sp.css
 tmp_folder=/tmp/tmdpress
 
 cat << EOF > $pyprochtml_path
@@ -35,24 +36,16 @@ EOF
 
 cat << EOF > $header_path
 <html>
+<head>
+<link rel="stylesheet" href="sp.css">
 <title>__TITLE__</title>
+</head>
 <body style="margin: 80px;">
 EOF
 
 cat << EOF > $footer_path
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-.slide {
-  font-family: arial;
-  font-size: 40pt;
-  font-weight: 1800;
-  width: "100%";
-}
-xmp {
-  font-family: monospace;
-  font-size: 28pt;
-  background-color: LightBlue;
-}
 @media print {
 .slide {
     page-break-before: always;
@@ -123,6 +116,124 @@ function printSlides() {
   x[slideIndex - 1].style.display = "block";
 }
 </script>
+EOF
+
+cat << EOF > $css_path
+/* https://susam.github.io/spcss/ */
+body {
+  color: #000;
+  font-family: helvetica, arial, sans-serif;
+  line-height: 1.5;
+  margin: 0 auto;
+  max-width: 40em;
+  padding: 0 1em;
+  font-size: 40pt;
+  font-weight: 1800;
+  width: "100%";
+}
+h1, h2, h3, h4, h5, h6 {
+  margin: 1em 0 0.5em 0;
+  line-height: 1.2;
+}
+a:link {
+  color: #00e;
+}
+a:visited {
+  color: #518;
+}
+a:focus, a:hover {
+  color: #03f;
+}
+a:active {
+  color: #e00;
+}
+h1 a:empty:before, h2 a:empty:before, h3 a:empty:before,
+h4 a:empty:before, h5 a:empty:before, h6 a:empty:before {
+  content: "#";
+}
+h1 a:empty, h2 a:empty, h3 a:empty, h4 a:empty, h5 a:empty, h6 a:empty {
+  visibility: hidden;
+  padding-left: 0.25em;
+}
+h1:hover a:empty, h2:hover a:empty, h3:hover a:empty,
+h4:hover a:empty, h5:hover a:empty, h6:hover a:empty {
+  visibility: visible;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 1em 0;
+  text-align: center;
+}
+figcaption {
+  font-size: small;
+}
+pre, code, samp, kbd {
+  color: #009;
+  font-family: monospace, monospace;
+}
+pre kbd {
+  color: #060;
+}
+pre, blockquote {
+  background: #eee;
+  padding: 0.5em;
+}
+pre {
+  overflow: auto;
+}
+blockquote {
+  border-left: medium solid #ccc;
+  margin: 1em 0;
+}
+blockquote :first-child {
+  margin-top: 0;
+}
+blockquote :last-child {
+  margin-bottom: 0;
+}
+table {
+  border-collapse: collapse;
+}
+th, td {
+  border: thin solid #999;
+  padding: 0.3em 0.4em;
+  text-align: left;
+}
+@media (prefers-color-scheme: dark) {
+  body {
+    color: #bbb;
+    background: #222;
+  }
+  a:link {
+    color: #9bf;
+  }
+  a:visited {
+    color: #caf;
+  }
+  a:focus, a:hover {
+    color: #9cf;
+  }
+  a:active {
+    color: #faa;
+  }
+  pre, code, samp, kbd {
+    color: #6cf;
+  }
+  pre kbd {
+    color: #9c9;
+  }
+  pre, blockquote {
+    background: #111;
+  }
+  blockquote {
+    border-color: #444;
+  }
+  th, td {
+    border-color: #666;
+  }
+}
 EOF
 
 usage()
